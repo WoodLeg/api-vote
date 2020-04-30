@@ -1,6 +1,6 @@
 import { isNull, isUndefined } from 'lodash';
 import jwt from 'jsonwebtoken';
-import User from '../../models/user';
+import User from 'models/user';
 
 export default class UserController {
   static async signin(request, response) {

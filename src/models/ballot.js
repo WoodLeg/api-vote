@@ -1,5 +1,5 @@
 import { isNull, isUndefined, isEmpty, sortBy } from 'lodash';
-import database from './db/database';
+import database from 'db/database';
 
 import Mention from './mention';
 import Vote from './vote';

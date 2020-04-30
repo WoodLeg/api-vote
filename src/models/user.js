@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import database from './db/database';
+import database from 'db/database';
 import { isNull, isUndefined } from 'lodash';
 import uuid from 'uuid';
 

@@ -1,12 +1,12 @@
-import Ballot from '../../models/ballot';
+import Ballot from 'models/ballot';
 import shortId from 'shortid';
 import { isUndefined, isEmpty, uniqBy } from 'lodash';
-import Candidate from '../../models/candidate';
-import Vote from '../../models/vote';
-import Mention from '../../models/mention';
-import database from '../../models/db/database';
+import Candidate from 'models/candidate';
+import Vote from 'models/vote';
+import Mention from 'models/mention';
+import database from 'db/database';
 import uuid from 'uuid';
-import User from '../../models/user';
+import User from 'models/user';
 
 export default class BallotController {
   static async getAll(request, response) {
@@ -22,6 +22,7 @@ export default class BallotController {
       ballots = await Ballot.findAll({ userUuid });
     } catch ({ code, message }) {
       response.status(code).json({ ok: false, error: { message } });
+      return;
     }
 
     response.json({ ok: true, data: { ballots } });
