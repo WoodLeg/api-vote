@@ -1,4 +1,17 @@
 {
   "presets": ["@babel/preset-env"],
-  "plugins": [["@babel/plugin-proposal-class-properties", { "loose": true }], "@babel/plugin-transform-runtime"]
+  "plugins": [
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    "@babel/plugin-transform-runtime",
+    [
+      "module-resolver",
+      {
+        "root": ["./src"],
+        "alias": {
+          "test": "./test",
+          "underscore": "lodash"
+        }
+      }
+    ]
+  ]
 }

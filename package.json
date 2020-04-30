@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/main.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/main",
+    "dev": "DB_PATH='src/db/development.sqlite' nodemon --exec babel-node src/main",
     "prod": "node src/main",
     "pretest": "rm -rf test/*.sqlite && sqlite3 test/test.sqlite < script/setup_db_test.sql",
     "test": "NODE_ENV='test' DB_PATH='test/test.sqlite' mocha --require @babel/register test/**/*.js --exit",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/WoodLeg/api-vote#readme",
   "devDependencies": {
+    "babel-plugin-module-resolver": "^4.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.3.0",
