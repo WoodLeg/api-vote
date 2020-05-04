@@ -34,8 +34,8 @@ describe('Ballots routes:', () => {
       let { ballot } = res.body.data;
       expect(ballot).to.haveOwnProperty('name');
       expect(ballot).to.haveOwnProperty('uuid');
-      expect(ballot).to.haveOwnProperty('userUuid');
-      expect(ballot.userUuid).to.be.equal('1111-1111111-1111-11111');
+      expect(ballot).to.haveOwnProperty('creatorUuid');
+      expect(ballot.creatorUuid).to.be.equal('1111-1111111-1111-11111');
       expect(ballot).to.haveOwnProperty('candidates');
       expect(ballot.candidates.length).to.be.equal(5);
       expect(ballot).to.haveOwnProperty('votes');

@@ -4,7 +4,7 @@ CREATE TABLE ballots
   ballot_name TEXT NOT NULL,
   ballot_uuid TEXT NOT NULL UNIQUE,
   ballot_url TEXT NOT NULL,
-  user_uuid TEXT NOT NULL,
+  creator_uuid TEXT NOT NULL,
   ballot_finished INTEGER NOT NULL
 );
 

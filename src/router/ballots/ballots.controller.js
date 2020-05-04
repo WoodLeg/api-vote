@@ -9,17 +9,18 @@ import uuid from 'uuid';
 import User from 'models/user';
 
 export default class BallotController {
+  // Returns all created ballots from user
   static async getAll(request, response) {
-    let userUuid = request.body.user.uuid;
+    let creatorUuid = request.body.user.uuid;
 
-    if (isUndefined(userUuid)) {
+    if (isUndefined(creatorUuid)) {
       response.status(401).json({ ok: false, error: { message: 'Requête refusée pour cette ressource.' } });
     }
 
     let ballots = [];
 
     try {
-      ballots = await Ballot.findAll({ userUuid });
+      ballots = await Ballot.findAll({ creatorUuid });
     } catch ({ code, message }) {
       response.status(code).json({ ok: false, error: { message } });
       return;
@@ -30,7 +31,7 @@ export default class BallotController {
 
   static async createBallot(request, response) {
     let { payload } = request.body;
-    let userUuId = request.body.user.uuid;
+    let creatorUuid = request.body.user.uuid;
 
     if (isUndefined(payload) || isUndefined(payload.name) || payload.candidates.length < 2) {
       response.status(422).json({ ok: false, error: { message: 'Il manque des informations pour la création de votre vote.' } });
@@ -47,10 +48,10 @@ export default class BallotController {
     let candidates = payload.candidates.map(item => {
       return new Candidate(item);
     });
-    let ballot = new Ballot(payload.name, { uuid: uuid.v4(), url: shortId.generate(), userUuid: userUuId, candidates });
-    let query = `INSERT INTO ballots (ballot_name, ballot_uuid, ballot_url, user_uuid, ballot_finished) VALUES ("${
+    let ballot = new Ballot(payload.name, { uuid: uuid.v4(), url: shortId.generate(), creatorUuid, candidates });
+    let query = `INSERT INTO ballots (ballot_name, ballot_uuid, ballot_url, creator_uuid, ballot_finished) VALUES ("${
       ballot.name
-    }", "${ballot.getUuid()}", "${ballot.getUrl()}", "${ballot.getUserUuid()}", 0)`;
+    }", "${ballot.getUuid()}", "${ballot.getUrl()}", "${ballot.getCreatorUuid()}", 0)`;
     try {
       await database.run(query);
     } catch (e) {
@@ -144,7 +145,7 @@ export default class BallotController {
     let ballot = new Ballot(ballotCapsule.ballot_name, {
       uuid: ballotCapsule.ballot_uuid,
       id: ballotCapsule.ballot_id,
-      userUuid: ballotCapsule.user_uuid,
+      creatorUuid: ballotCapsule.creator_uuid,
       url: ballotCapsule.ballot_url
     });
 
@@ -195,10 +196,10 @@ export default class BallotController {
 
   static async proceedElection(request, response) {
     let { uuid } = request.params;
-    let userUuid = undefined;
+    let creatorUuid = undefined;
 
     if (request.body.user) {
-      userUuid = request.body.user.uuid;
+      creatorUuid = request.body.user.uuid;
     }
 
     try {
@@ -240,7 +241,7 @@ export default class BallotController {
       id: tmp.ballot_id,
       uuid: tmp.ballot_uuid,
       url: tmp.ballot_url,
-      userUuid: tmp.user_uuid,
+      creatorUuid: tmp.creator_uuid,
       finished: tmp.ballot_finished ? true : false,
       candidates: candidatesUnified
     });
@@ -252,17 +253,17 @@ export default class BallotController {
 
     ballot.setVotes(votes);
 
-    if (!isUndefined(userUuid)) {
+    if (!isUndefined(creatorUuid)) {
       let userCapsule = {};
       try {
-        userCapsule = await database.get(`SELECT * FROM users where users.uuid ="${userUuid}"`);
+        userCapsule = await database.get(`SELECT * FROM users where users.uuid ="${creatorUuid}"`);
       } catch (error) {
         response.status(500).json({ error: { message: 'Error user GET database', body: error } });
         return;
       }
 
       let user = new User(userCapsule.data.username, userCapsule.data.password, { uuid: userCapsule.data.uuid });
-      let isOwner = ballot.getUserUuid() === user.uuid;
+      let isOwner = ballot.getCreatorUuid() === user.uuid;
 
       if (isOwner) {
         try {

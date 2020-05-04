@@ -4,7 +4,7 @@ CREATE TABLE ballots
   ballot_name TEXT NOT NULL,
   ballot_uuid TEXT NOT NULL UNIQUE,
   ballot_url TEXT NOT NULL,
-  user_uuid TEXT NOT NULL,
+  creator_uuid TEXT NOT NULL,
   ballot_finished INTEGER NOT NULL
 );
 
@@ -38,7 +38,7 @@ VALUES
   ('Jim', "$2b$10$t5hdPcGMhgiFs0WBJxU/i.jbtPP9mHiIOUZ4hvK0n44UAwzleVFKu", "1111-1111111-1111-11111");
 
 INSERT INTO ballots
-  (ballot_name, ballot_uuid, ballot_url, user_uuid, ballot_finished)
+  (ballot_name, ballot_uuid, ballot_url, creator_uuid, ballot_finished)
 VALUES
   ('Best artists', "0000-0000000-0000-00000", 'urlG3n3r8ted', '1111-1111111-1111-11111', 0),
   ('Films', "2222-2222222-2222222-22222", 'dzfgQNCDa', '1111-1111111-1111-11111', 0);

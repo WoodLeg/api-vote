@@ -31,7 +31,7 @@ const ballotSuccessResponse = {
     uuid: '0000-0000000-0000-00000',
     id: 1,
     url: 'urlG3n3r8ted',
-    userUuid: '1111-1111111-1111-11111',
+    creatorUuid: '1111-1111111-1111-11111',
     votes: [],
     finished: false,
     mentions: mentionsFixture,

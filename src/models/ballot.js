@@ -11,7 +11,6 @@ export default class Ballot {
   url = null;
   id = null;
   uuid = null;
-  userUuid = null;
   finished = false;
 
   mentions = [];
@@ -24,7 +23,7 @@ export default class Ballot {
     this.uuid = options.uuid || '';
     this.id = options.id || null;
     this.url = options.url || '';
-    this.userUuid = options.userUuid || null;
+    this.creatorUuid = options.creatorUuid || null;
     this.candidates = options.candidates || [];
     this.votes = options.votes || [];
     this.finished = options.finished || false;
@@ -47,8 +46,8 @@ export default class Ballot {
     return this.url;
   }
 
-  getUserUuid() {
-    return this.userUuid;
+  getCreatorUuid() {
+    return this.creatorUuid;
   }
 
   getMentions() {
@@ -163,7 +162,7 @@ export default class Ballot {
     // https://fr.wikipedia.org/wiki/Jugement_majoritaire
   }
 
-  static async findAll({ userUuid }) {
+  static async findAll({ creatorUuid }) {
     return new Promise(async (resolve, reject) => {
       try {
         await database.open();
@@ -174,7 +173,7 @@ export default class Ballot {
       }
 
       let capsule;
-      let query = `SELECT * FROM ballots WHERE user_uuid="${userUuid}"`;
+      let query = `SELECT * FROM ballots WHERE creator_uuid="${creatorUuid}"`;
       try {
         capsule = await database.all(query);
       } catch (error) {
@@ -186,7 +185,7 @@ export default class Ballot {
 
       let ballots = capsule.data.map(item => {
         return new Ballot(item.ballot_name, {
-          userUuid,
+          creatorUuid,
           url: item.ballot_url,
           id: item.ballot_id,
           finished: item.ballot_finished ? true : false
@@ -236,7 +235,7 @@ export default class Ballot {
 
       let ballot = new Ballot(ballotCapsule.ballot_name, {
         uuid: ballotCapsule.ballot_uuid,
-        userUuid: ballotCapsule.user_uuid,
+        creatorUuid: ballotCapsule.creator_uuid,
         id: ballotCapsule.ballot_id,
         url: ballotCapsule.ballot_url,
         finished: ballotCapsule.ballot_finished ? true : false,

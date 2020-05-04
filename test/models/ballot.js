@@ -8,7 +8,7 @@ describe('Ballot model', () => {
   let uuid = '2222-2222222-2222222-22222';
   let id = 1;
   let url = 'dzfgQNCDa';
-  let userUuid = '1111-1111111-1111111-11111';
+  let creatorUuid = '1111-1111111-1111111-11111';
   let candidates = [new Candidate('Matrix'), new Candidate('Interstellar')];
   let votes = [];
   let finished = false;
@@ -19,7 +19,7 @@ describe('Ballot model', () => {
       uuid,
       id,
       url,
-      userUuid,
+      creatorUuid,
       candidates,
       votes,
       finished
@@ -34,8 +34,8 @@ describe('Ballot model', () => {
     expect(ballot.getUrl()).to.be.equal(url);
   });
 
-  it('getUserUuid() should return the creator uuid', () => {
-    expect(ballot.getUserUuid()).to.be.equal(userUuid);
+  it('getCreatorUuid() should return the creator uuid', () => {
+    expect(ballot.getCreatorUuid()).to.be.equal(creatorUuid);
   });
 
   it('getMentions() should return the mentions array', () => {
@@ -135,8 +135,8 @@ describe('Ballot model', () => {
     });
 
     it('findAll() should return all the user ballot', async () => {
-      let userUuid = '1111-1111111-1111-11111';
-      const found = await Ballot.findAll({ userUuid });
+      let creatorUuid = '1111-1111111-1111-11111';
+      const found = await Ballot.findAll({ creatorUuid });
       expect(found).to.not.be.undefined;
       expect(found).to.be.an('array');
     });
