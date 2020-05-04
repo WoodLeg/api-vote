@@ -7,7 +7,7 @@ import Mention from 'models/mention';
 import database from 'db/database';
 import uuid from 'uuid';
 import User from 'models/user';
-import { Error as JSONApiError } from 'jsonapi-serializer';
+import { Serializer, Error as JSONApiError } from 'jsonapi-serializer';
 
 export default class BallotController {
   // Returns all created ballots from user
@@ -103,7 +103,18 @@ export default class BallotController {
       return;
     }
 
-    response.json({ ok: true, data: { ballot } }).status(200);
+    const BallotSerializer = new Serializer('ballot', {
+      attributes: ['name', 'url', 'id', 'uuid', 'finished', 'mentions', 'candidates', 'electionResult'],
+      candidates: {
+        ref: 'uuid',
+        included: true,
+        attributes: ['name', 'rank', 'merits', 'median', 'uuid']
+      }
+    });
+
+    const payload = BallotSerializer.serialize(ballot);
+
+    response.json(payload).status(200);
   }
 
   static async addVote(request, response) {

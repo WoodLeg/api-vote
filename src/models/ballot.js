@@ -11,6 +11,7 @@ export default class Ballot {
   url = null;
   id = null;
   uuid = null;
+  creatorUuid = null;
   finished = false;
 
   mentions = [];

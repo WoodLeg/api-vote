@@ -26,39 +26,96 @@ const mentionsFixture = [
 ];
 
 const ballotSuccessResponse = {
-  ballot: {
-    name: 'Best artists',
-    uuid: '0000-0000000-0000-00000',
-    id: 1,
-    url: 'urlG3n3r8ted',
-    creatorUuid: '1111-1111111-1111-11111',
-    votes: [],
-    finished: false,
-    mentions: mentionsFixture,
-    electionResult: [],
-    candidates: [
-      {
+  included: [
+    {
+      type: 'candidates',
+      id: '9999-9999999-9999-99999',
+      attributes: {
         name: 'Janis Joplin',
-        uuid: '9999-9999999-9999-99999',
         rank: null,
         merits: [],
-        median: null
-      },
-      {
-        name: 'The Doors',
-        uuid: '2323-2323232-2323-23232',
-        rank: null,
-        merits: [],
-        median: null
-      },
-      {
-        name: 'The Who',
-        uuid: '8888-8888888-8888-88888',
-        rank: null,
-        merits: [],
-        median: null
+        median: null,
+        uuid: '9999-9999999-9999-99999'
       }
-    ]
+    },
+    {
+      type: 'candidates',
+      id: '2323-2323232-2323-23232',
+      attributes: {
+        name: 'The Doors',
+        rank: null,
+        merits: [],
+        median: null,
+        uuid: '2323-2323232-2323-23232'
+      }
+    },
+    {
+      type: 'candidates',
+      id: '8888-8888888-8888-88888',
+      attributes: {
+        name: 'The Who',
+        rank: null,
+        merits: [],
+        median: null,
+        uuid: '8888-8888888-8888-88888'
+      }
+    }
+  ],
+  data: {
+    type: 'ballots',
+    id: '1',
+    attributes: {
+      name: 'Best artists',
+      url: 'urlG3n3r8ted',
+      id: 1,
+      uuid: '0000-0000000-0000-00000',
+      finished: false,
+      mentions: [
+        {
+          label: 'Excellent',
+          rank: 0
+        },
+        {
+          label: 'Good',
+          rank: 1
+        },
+        {
+          label: 'Pretty Good',
+          rank: 2
+        },
+        {
+          label: 'Fair',
+          rank: 3
+        },
+        {
+          label: 'Insufficient',
+          rank: 4
+        },
+        {
+          label: 'To Reject',
+          rank: 5
+        }
+      ],
+      'election-result': []
+    },
+    relationships: {
+      candidates: {
+        data: [
+          {
+            type: 'candidates',
+            id: '9999-9999999-9999-99999'
+          },
+          {
+            type: 'candidates',
+            id: '2323-2323232-2323-23232'
+          },
+          {
+            type: 'candidates',
+            id: '8888-8888888-8888-88888'
+          }
+        ]
+      }
+    }
   }
 };
 

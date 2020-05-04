@@ -18,7 +18,7 @@ describe('Ballots routes:', () => {
     it('should return 200 status code with ballot payload', async () => {
       const res = await requester.get('/ballots/urlG3n3r8ted');
       expect(res).to.have.status(200);
-      expect(res.body.data).to.be.deep.equal(ballotPayload);
+      expect(res.body).to.be.deep.equal(ballotPayload);
     });
   });
 
@@ -85,22 +85,22 @@ describe('Ballots routes:', () => {
 
   describe('POST /:uuid/addVote', () => {
     it('should return a 422 if no vote provided', async () => {
-      let { ballot } = ballotPayload;
-      const res = await requester.post(`/ballots/${ballot.uuid}/addVote`).send(addVote);
+      let ballotUuid = '0000-0000000-0000-00000';
+      const res = await requester.post(`/ballots/${ballotUuid}/addVote`).send(addVote);
       expect(res).to.have.status(422);
       expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'No vote given' }] });
     });
 
     it('should return a 422 if no candidates provided', async () => {
-      let { ballot } = ballotPayload;
-      const res = await requester.post(`/ballots/${ballot.uuid}/addVote`).send({ vote: { candidates: [] } });
+      let ballotUuid = '0000-0000000-0000-00000';
+      const res = await requester.post(`/ballots/${ballotUuid}/addVote`).send({ vote: { candidates: [] } });
       expect(res).to.have.status(422);
       expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'No candidates provided for the vote' }] });
     });
 
     it('should return 201 for adding a vote', async () => {
-      let { ballot } = ballotPayload;
-      const res = await requester.post(`/ballots/${ballot.uuid}/addVote`).send({ vote: addVote });
+      let ballotUuid = '0000-0000000-0000-00000';
+      const res = await requester.post(`/ballots/${ballotUuid}/addVote`).send({ vote: addVote });
 
       expect(res).to.have.status(201);
       expect(res.body.data).to.haveOwnProperty('votes');
@@ -130,8 +130,8 @@ describe('Ballots routes:', () => {
 
   describe('GET /:uuid/proceed', () => {
     it('should returns 200 status code and ballot not finished', async () => {
-      let b = ballotPayload.ballot;
-      const res = await requester.get(`/ballots/${b.uuid}/proceed`);
+      let ballotUuid = '0000-0000000-0000-00000';
+      const res = await requester.get(`/ballots/${ballotUuid}/proceed`);
 
       expect(res).to.have.status(200);
       let { ballot } = res.body.data;
@@ -141,14 +141,12 @@ describe('Ballots routes:', () => {
     });
 
     it('should returns 200 status code and ballot finished', async () => {
-      let b = ballotPayload.ballot;
-      const res = await requester.get(`/ballots/${b.uuid}/proceed`).set('Authorization', token);
+      let ballotUuid = '0000-0000000-0000-00000';
+      const res = await requester.get(`/ballots/${ballotUuid}/proceed`).set('Authorization', token);
 
       expect(res).to.have.status(200);
-      let { ballot } = res.body.data;
-      expect(ballot.electionResult).to.be.deep.equal(electrionResult);
-      expect(ballot.electionResult.length).to.be.equal(ballot.candidates.length);
-      expect(ballot.finished).to.be.ok;
+
+      expect(res.body.data.ballot.finished).to.be.true;
     });
 
     it('should returns 404 status code', async () => {
