@@ -26,23 +26,6 @@ describe('Ballot model', () => {
     });
   });
 
-  it('getUuid() should return the uuid of the ballot', () => {
-    expect(ballot.getUuid()).to.be.equal(uuid);
-  });
-
-  it('getUrl() should return the url', () => {
-    expect(ballot.getUrl()).to.be.equal(url);
-  });
-
-  it('getCreatorUuid() should return the creator uuid', () => {
-    expect(ballot.getCreatorUuid()).to.be.equal(creatorUuid);
-  });
-
-  it('getMentions() should return the mentions array', () => {
-    let mentions = ballot.getMentions();
-    expect(mentions.length).to.be.above(4);
-  });
-
   it('getMentionsByRank() should return one mention by rank given', () => {
     let mention = ballot.getMentionsByRank(0);
     expect(mention).to.not.be.undefined;
@@ -51,69 +34,53 @@ describe('Ballot model', () => {
     expect(mention).to.not.be.undefined;
   });
 
-  it('getCandidates() should return an array of candidates', () => {
-    let candidates = ballot.getCandidates();
-    expect(candidates).to.not.be.undefined;
-    expect(candidates.length).to.be.at.least(2);
-  });
-
-  it('getCandidate() should return one candidate by its name', () => {
-    // To be refact
-    let candidate = ballot.getCandidate('Matrix');
-    expect(candidate).to.not.be.undefined;
-  });
-
   it('isFinished() returns the status', () => {
     expect(ballot.isFinished()).to.not.be.ok;
   });
 
   it('addCandidate() should add a need candidate', () => {
-    expect(ballot.getCandidates().length).to.be.equal(2);
+    expect(ballot.candidates.length).to.be.equal(2);
     ballot.addCandidate(new Candidate('Only lovers left alive'));
-    expect(ballot.getCandidates().length).to.be.equal(3);
+    expect(ballot.candidates.length).to.be.equal(3);
   });
 
   describe('setCandidates():', () => {
     it('should replace the candidates by the ones provided', () => {
-      expect(ballot.getCandidates()).to.be.equal(candidates);
+      expect(ballot.candidates).to.be.equal(candidates);
 
       let newCandidates = [new Candidate('Pulp fiction'), new Candidate('Desperado')];
       ballot.setCandidates(newCandidates);
 
-      expect(ballot.getCandidates()).to.be.equal(newCandidates);
+      expect(ballot.candidates).to.be.equal(newCandidates);
     });
 
     it('should not replace if new array is less than 2 elements', () => {
-      expect(ballot.getCandidates()).to.be.equal(candidates);
+      expect(ballot.candidates).to.be.equal(candidates);
 
       let newCandidates = [new Candidate('Pulp fiction')];
       ballot.setCandidates(newCandidates);
 
-      expect(ballot.getCandidates()).to.be.equal(candidates);
+      expect(ballot.candidates).to.be.equal(candidates);
     });
   });
 
-  it('getVotes() should returns an array', () => {
-    expect(ballot.getVotes()).to.not.be.undefined;
-  });
-
   it('setVotes() should set the votes', () => {
-    expect(ballot.getVotes().length).to.be.equal(0);
+    expect(ballot.votes.length).to.be.equal(0);
     let votes = [];
     for (let i = 0; i < 10; i++) {
       votes.push(new Vote(new Candidate('Matrix'), new Mention('Excellent', 0)));
     }
     ballot.setVotes(votes);
-    expect(ballot.getVotes().length).to.be.equal(10);
+    expect(ballot.votes.length).to.be.equal(10);
   });
 
   describe('addVote(): ', () => {
     it('should add a vote', () => {
-      expect(ballot.getVotes().length).to.be.equal(0);
+      expect(ballot.votes.length).to.be.equal(0);
 
       ballot.addVote(new Vote(new Candidate('Matrix'), new Mention('Excellent', 0)));
 
-      expect(ballot.getVotes().length).to.be.equal(1);
+      expect(ballot.votes.length).to.be.equal(1);
     });
 
     it('should throw an error if candidate does not exist', () => {

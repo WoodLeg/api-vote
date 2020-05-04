@@ -49,9 +49,7 @@ export default class BallotController {
       return new Candidate(item);
     });
     let ballot = new Ballot(payload.name, { uuid: uuid.v4(), url: shortId.generate(), creatorUuid, candidates });
-    let query = `INSERT INTO ballots (ballot_name, ballot_uuid, ballot_url, creator_uuid, ballot_finished) VALUES ("${
-      ballot.name
-    }", "${ballot.getUuid()}", "${ballot.getUrl()}", "${ballot.getCreatorUuid()}", 0)`;
+    let query = `INSERT INTO ballots (ballot_name, ballot_uuid, ballot_url, creator_uuid, ballot_finished) VALUES ("${ballot.name}", "${ballot.uuid}", "${ballot.url}", "${ballot.creatorUuid}", 0)`;
     try {
       await database.run(query);
     } catch (e) {
@@ -63,7 +61,7 @@ export default class BallotController {
 
     let candidatesValues = '';
     candidates.forEach(candidate => {
-      candidatesValues += `("${candidate.getName()}", "${ballot.getUuid()}", "${uuid.v4()}"),`;
+      candidatesValues += `("${candidate.getName()}", "${ballot.uuid}", "${uuid.v4()}"),`;
     });
     candidatesValues = candidatesValues.replace(/.$/, ';');
 
@@ -149,7 +147,7 @@ export default class BallotController {
       url: ballotCapsule.ballot_url
     });
 
-    ballotMentions = ballot.getMentions();
+    ballotMentions = ballot.mentions;
 
     let items = candidatesToProcess.map(item => {
       return {
@@ -175,7 +173,7 @@ export default class BallotController {
     let voteQueryInsert = ``;
 
     votesToAdd.forEach(vote => {
-      voteQueryInsert += `("${vote.getCandidate().getUuid()}", "${vote.getMention().getRank()}", "${ballot.getUuid()}"),`;
+      voteQueryInsert += `("${vote.getCandidate().getUuid()}", "${vote.getMention().getRank()}", "${ballot.uuid}"),`;
     });
     voteQueryInsert = voteQueryInsert.replace(/.$/, ';');
 
@@ -263,7 +261,7 @@ export default class BallotController {
       }
 
       let user = new User(userCapsule.data.username, userCapsule.data.password, { uuid: userCapsule.data.uuid });
-      let isOwner = ballot.getCreatorUuid() === user.uuid;
+      let isOwner = ballot.creatorUuid === user.uuid;
 
       if (isOwner) {
         try {

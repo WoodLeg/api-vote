@@ -38,28 +38,8 @@ export default class Ballot {
     this.electionResult = [];
   }
 
-  getUuid() {
-    return this.uuid;
-  }
-
-  getUrl() {
-    return this.url;
-  }
-
-  getCreatorUuid() {
-    return this.creatorUuid;
-  }
-
-  getMentions() {
-    return this.mentions;
-  }
-
   getMentionsByRank(rank) {
     return this.mentions.find(item => item.getRank() === rank) || new Mention('To Reject', 5);
-  }
-
-  getCandidates() {
-    return this.candidates;
   }
 
   getCandidate(name) {
@@ -83,17 +63,9 @@ export default class Ballot {
     return this;
   }
 
-  getVotes() {
-    return this.votes;
-  }
-
   setVotes(votes) {
     this.votes = votes;
     return this;
-  }
-
-  getElectionResult() {
-    return this.electionResult;
   }
 
   addElectionResult(elected) {
@@ -143,7 +115,7 @@ export default class Ballot {
       let candidateVotes = votesByCandidates[candidate.getName()];
       let candidateName = candidate.getName();
       if (!isEmpty(votesByCandidates[candidateName])) {
-        let majorityMentionObject = meritProfile.processMajorityMention(candidate, candidateVotes, this.getMentions());
+        let majorityMentionObject = meritProfile.processMajorityMention(candidate, candidateVotes, this.mentions);
         resultElection[candidate.getName()] = majorityMentionObject;
       }
     });
