@@ -31,7 +31,7 @@ export default class UserController {
     let userAuthenticated = user.testPassword(password);
 
     let bearer = 'Bearer ';
-    bearer += jwt.sign({ username: user.getUsername(), uuid: user.getUuid() }, 'dredd');
+    bearer += jwt.sign({ username: user.username, uuid: user.uuid }, 'dredd');
 
     const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'], meta: { bearer } });
 
@@ -64,7 +64,7 @@ export default class UserController {
     }
 
     let bearer = 'Bearer ';
-    bearer += jwt.sign({ username: user.getUsername(), uuid: user.getUuid() }, 'dredd');
+    bearer += jwt.sign({ username: user.username, uuid: user.uuid }, 'dredd');
 
     const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'], meta: { bearer } });
     let payload = UserSerializer.serialize(user);

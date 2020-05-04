@@ -262,7 +262,7 @@ export default class BallotController {
       }
 
       let user = new User(userCapsule.data.username, userCapsule.data.password, { uuid: userCapsule.data.uuid });
-      let isOwner = ballot.getUserUuid() === user.getUuid();
+      let isOwner = ballot.getUserUuid() === user.uuid;
 
       if (isOwner) {
         try {
