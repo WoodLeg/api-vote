@@ -23,6 +23,18 @@ describe('User routes:', () => {
       expect(payload).to.be.deep.equal({ data: { type: 'users', id: '1', attributes: { username: 'Jim', uuid: '1111-1111111-1111-11111' } } });
     });
 
+    it('should returns a 422 if missing password', async () => {
+      const res = await requester.post('/users/signin').send({ username: 'Peter' });
+      expect(res).to.have.status(422);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters' }] });
+    });
+
+    it('should returns a 422 if missing username', async () => {
+      const res = await requester.post('/users/signin').send({ password: 'passwordTest' });
+      expect(res).to.have.status(422);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters' }] });
+    });
+
     it('should returns 401 if username invalid', async () => {
       const res = await requester.post('/users/signin').send({ username: 'Peter', password: 'qwerty' });
 
