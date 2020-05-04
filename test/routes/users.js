@@ -12,31 +12,29 @@ describe('User routes:', () => {
       const res = await requester.post('/users/signin');
       expect(res).to.have.status(422);
       expect(res.ok).to.be.not.ok;
-      expect(res.body).to.be.deep.equal({ error: { message: 'Credentials manquants' } });
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters' }] });
     });
 
     it('should return 200 with user payload', async () => {
       const res = await requester.post('/users/signin').send({ username: 'Jim', password: 'qwerty' });
 
       expect(res).to.have.status(200);
-      let user = res.body.data.user;
-      expect(user).to.be.ok;
-      expect(user).to.haveOwnProperty('id');
-      expect(user).to.haveOwnProperty('username');
-      expect(user).to.haveOwnProperty('uuid');
-      expect(res.body.data.user).to.haveOwnProperty('bearer');
+      let payload = res.body;
+      expect(payload).to.be.deep.equal({ data: { type: 'users', id: '1', attributes: { username: 'Jim', uuid: '1111-1111111-1111-11111' } } });
     });
 
     it('should returns 401 if username invalid', async () => {
       const res = await requester.post('/users/signin').send({ username: 'Peter', password: 'qwerty' });
 
       expect(res).to.have.status(401);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Username or password invalid' }] });
     });
 
     it('should returns 401 if password invalid', async () => {
       const res = await requester.post('/users/signin').send({ username: 'Jim', password: 'hendrix' });
 
       expect(res).to.have.status(401);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Wrong username or password' }] });
     });
   });
 
