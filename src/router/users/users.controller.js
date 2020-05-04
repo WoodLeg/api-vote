@@ -1,13 +1,17 @@
 import { isNull, isUndefined } from 'lodash';
 import jwt from 'jsonwebtoken';
 import User from 'models/user';
+import { Serializer, Error as JSONApiError } from 'jsonapi-serializer';
+
+const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'] });
 
 export default class UserController {
   static async signin(request, response) {
     let { username, password } = request.body;
 
     if (isNull(username) || isNull(password) || isUndefined(username) || isUndefined(password)) {
-      response.status(422).json({ error: { message: 'Credentials manquants' } });
+      let err = new JSONApiError({ status: 422, detail: 'Missing parameters' });
+      response.status(422).json(err);
       return;
     }
 
@@ -15,11 +19,14 @@ export default class UserController {
     try {
       user = await User.findByUsername(username);
     } catch ({ code, message }) {
+      let err;
       if (code === 404) {
-        response.status(401).json({ ok: false, error: { message: 'Pseudo ou mot de passe invalide.' } });
+        err = new JSONApiError({ status: 401, detail: 'Username or password invalid' });
+        response.status(401).json(err);
         return;
       }
-      response.status(code).json({ ok: false, error: { message } });
+      err = new JSONApiError({ status: code, detail: message });
+      response.status(code).json(err);
       return;
     }
 
@@ -29,9 +36,11 @@ export default class UserController {
     bearer += jwt.sign({ username: user.getUsername(), uuid: user.getUuid() }, 'dredd');
 
     if (userAuthenticated) {
-      response.json({ data: { user: { id: user.getId(), uuid: user.getUuid(), username: user.getUsername(), bearer } } });
+      let payload = UserSerializer.serialize(user);
+      response.json(payload);
     } else {
-      response.status(401).json({ error: { message: 'Mauvais pseudo/mot de passe' } });
+      const err = new JSONApiError({ status: 401, detail: 'Wrong username or password' });
+      response.status(401).json(err);
     }
   }
 
