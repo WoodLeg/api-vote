@@ -20,7 +20,17 @@ describe('User routes:', () => {
 
       expect(res).to.have.status(200);
       let payload = res.body;
-      expect(payload).to.be.deep.equal({ data: { type: 'users', id: '1', attributes: { username: 'Jim', uuid: '1111-1111111-1111-11111' } } });
+      expect(payload.data).to.deep.equal({
+        type: 'users',
+        id: '1',
+        attributes: {
+          username: 'Jim',
+          uuid: '1111-1111111-1111-11111'
+        }
+      });
+      let bearer = payload.meta.bearer.split(' ');
+      expect(bearer[0]).to.be.equal('Bearer');
+      expect(bearer[1]).to.match(/^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$/);
     });
 
     it('should returns a 422 if missing password', async () => {
@@ -54,21 +64,24 @@ describe('User routes:', () => {
     it('should return 201', async () => {
       const res = await requester.post('/users/signup').send({ username: 'Janis', password: 'joplin' });
       expect(res).to.have.status(201);
-      let { user } = res.body.data;
-      expect(user).to.haveOwnProperty('id');
-      expect(user).to.haveOwnProperty('uuid');
-      expect(user).to.haveOwnProperty('username');
-      expect(user).to.haveOwnProperty('bearer');
+      let payload = res.body;
+      expect(payload.data.attributes.username).to.be.equal('Janis');
+      expect(payload.data.attributes.uuid).to.match(/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/);
+      let bearer = payload.meta.bearer.split(' ');
+      expect(bearer[0]).to.equal('Bearer');
+      expect(bearer[1]).to.match(/^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$/);
     });
 
     it('should return 422 when trying to signup already', async () => {
       const res = await requester.post('/users/signup').send({ username: 'Jim', password: 'qwerty' });
-      expect(res).to.have.status(422);
+      expect(res).to.have.status(401);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Username already taken' }] });
     });
 
     it('should return 422 if no data is provided', async () => {
       const res = await requester.post('/users/signup');
       expect(res).to.have.status(422);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters' }] });
     });
   });
 });

@@ -91,7 +91,7 @@ export default class User {
       }
 
       if (found.data) {
-        reject({ code: 422, message: 'Username already taken' });
+        reject({ code: 401, message: 'Username already taken' });
       }
 
       let insertQuery = `INSERT INTO users (username, password, uuid) VALUES ('${this.username}', '${this.password}', '${this.uuid}');`;

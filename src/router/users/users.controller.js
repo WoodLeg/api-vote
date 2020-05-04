@@ -3,8 +3,6 @@ import jwt from 'jsonwebtoken';
 import User from 'models/user';
 import { Serializer, Error as JSONApiError } from 'jsonapi-serializer';
 
-const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'] });
-
 export default class UserController {
   static async signin(request, response) {
     let { username, password } = request.body;
@@ -35,6 +33,8 @@ export default class UserController {
     let bearer = 'Bearer ';
     bearer += jwt.sign({ username: user.getUsername(), uuid: user.getUuid() }, 'dredd');
 
+    const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'], meta: { bearer } });
+
     if (userAuthenticated) {
       let payload = UserSerializer.serialize(user);
       response.json(payload);
@@ -58,13 +58,17 @@ export default class UserController {
     try {
       await user.save();
     } catch ({ code, message }) {
-      response.status(code).json({ ok: false, error: { message } });
+      let err = new JSONApiError({ status: code, detail: message });
+      response.status(code).json(err);
       return;
     }
 
     let bearer = 'Bearer ';
     bearer += jwt.sign({ username: user.getUsername(), uuid: user.getUuid() }, 'dredd');
 
-    response.status(201).json({ data: { user: { id: user.getId(), uuid: user.getUuid(), username: user.getUsername(), bearer } } });
+    const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'], meta: { bearer } });
+    let payload = UserSerializer.serialize(user);
+
+    response.status(201).json(payload);
   }
 }
