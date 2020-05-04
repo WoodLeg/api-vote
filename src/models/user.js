@@ -16,18 +16,6 @@ export default class User {
     this.id = options.id || null;
   }
 
-  getUsername() {
-    return this.username;
-  }
-
-  getUuid() {
-    return this.uuid;
-  }
-
-  getId() {
-    return this.id;
-  }
-
   addPassword(password) {
     let hashPassword = bcrypt.hashSync(password, 10);
     this.password = hashPassword;
