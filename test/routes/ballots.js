@@ -117,7 +117,7 @@ describe('Ballots routes:', () => {
     it('should return a 401 status code if no token provided', async () => {
       const res = await requester.get('/ballots');
       expect(res).to.have.status(401);
-      expect(res.body).to.deep.equal({ error: 'Missing jwt' });
+      expect(res.body).to.deep.equal({ errors: [{ detail: 'Missing jwt header', status: 401 }] });
     });
 
     it('should return a 200 status code', async () => {
@@ -129,17 +129,6 @@ describe('Ballots routes:', () => {
   });
 
   describe('GET /:uuid/proceed', () => {
-    it('should returns 200 status code and ballot not finished', async () => {
-      let ballotUuid = '0000-0000000-0000-00000';
-      const res = await requester.get(`/ballots/${ballotUuid}/proceed`);
-
-      expect(res).to.have.status(200);
-      let { ballot } = res.body.data;
-      expect(ballot.electionResult).to.be.an('array');
-      expect(ballot.electionResult.length).to.be.equal(3);
-      expect(ballot.finished).to.be.not.ok;
-    });
-
     it('should returns 200 status code and ballot finished', async () => {
       let ballotUuid = '0000-0000000-0000-00000';
       const res = await requester.get(`/ballots/${ballotUuid}/proceed`).set('Authorization', token);
@@ -150,7 +139,7 @@ describe('Ballots routes:', () => {
     });
 
     it('should returns 404 status code', async () => {
-      const res = await requester.get('/ballots/khsfkhhkhsf/proceed');
+      const res = await requester.get('/ballots/khsfkhhkhsf/proceed').set('Authorization', token);
 
       expect(res).to.have.status(404);
       expect(res.body).to.deep.equal({ errors: [{ status: 404, detail: 'Ballot not found' }] });

@@ -221,10 +221,10 @@ export default class BallotController {
 
   static async proceedElection(request, response) {
     let { uuid } = request.params;
-    let creatorUuid = undefined;
+    let requesterUuid = undefined;
 
     if (request.body.user) {
-      creatorUuid = request.body.user.uuid;
+      requesterUuid = request.body.user.uuid;
     }
 
     try {
@@ -281,10 +281,10 @@ export default class BallotController {
 
     ballot.setVotes(votes);
 
-    if (!isUndefined(creatorUuid)) {
+    if (!isUndefined(requesterUuid)) {
       let userCapsule = {};
       try {
-        userCapsule = await database.get(`SELECT * FROM users where users.uuid ="${creatorUuid}"`);
+        userCapsule = await database.get(`SELECT * FROM users where users.uuid ="${requesterUuid}"`);
       } catch (error) {
         const err = new JSONApiError({ status: 500, detail: { message: 'Error user GET database', body: error } });
         response.status(500).json(err);
