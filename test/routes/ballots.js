@@ -10,10 +10,9 @@ var requester = chai.request(app).keepOpen();
 describe('Ballots routes:', () => {
   describe('GET /ballots/:url', () => {
     it('should return 404 status code with the ballot', async () => {
-      let errorResponse = { ok: false, error: { message: 'No poll found' } };
       const res = await requester.get('/ballots/jsfjbc');
       expect(res).to.have.status(404);
-      expect(res.body).to.be.deep.equal(errorResponse);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 404, detail: 'No poll found' }] });
     });
 
     it('should return 200 status code with ballot payload', async () => {
@@ -59,6 +58,7 @@ describe('Ballots routes:', () => {
         .send({ payload: { candidates } });
 
       expect(res).to.have.status(422);
+      expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters for creating the ballot' }] });
     });
 
     it('should return 422 status code if no payload provided', async () => {
@@ -69,6 +69,7 @@ describe('Ballots routes:', () => {
         .send({ candidates });
 
       expect(res).to.have.status(422);
+      expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters for creating the ballot' }] });
     });
 
     it('should return 422 status code if candidateslength < 2', async () => {
@@ -78,6 +79,7 @@ describe('Ballots routes:', () => {
         .send({ name: 'Test', candidates: ['Jack'] });
 
       expect(res).to.have.status(422);
+      expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters for creating the ballot' }] });
     });
   });
 
@@ -86,12 +88,14 @@ describe('Ballots routes:', () => {
       let { ballot } = ballotPayload;
       const res = await requester.post(`/ballots/${ballot.uuid}/addVote`).send(addVote);
       expect(res).to.have.status(422);
+      expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'No vote given' }] });
     });
 
     it('should return a 422 if no candidates provided', async () => {
       let { ballot } = ballotPayload;
       const res = await requester.post(`/ballots/${ballot.uuid}/addVote`).send({ vote: { candidates: [] } });
       expect(res).to.have.status(422);
+      expect(res.body).to.deep.equal({ errors: [{ status: 422, detail: 'No candidates provided for the vote' }] });
     });
 
     it('should return 201 for adding a vote', async () => {
@@ -105,6 +109,7 @@ describe('Ballots routes:', () => {
     it('should return 404 if no ballot found', async () => {
       const res = await requester.post('/ballots/khsfbhslhsfkmsf/addVote').send({ vote: addVote });
       expect(res).to.have.status(404);
+      expect(res.body).to.deep.equal({ errors: [{ status: 404, detail: 'No election found' }] });
     });
   });
 
@@ -112,6 +117,7 @@ describe('Ballots routes:', () => {
     it('should return a 401 status code if no token provided', async () => {
       const res = await requester.get('/ballots');
       expect(res).to.have.status(401);
+      expect(res.body).to.deep.equal({ error: 'Missing jwt' });
     });
 
     it('should return a 200 status code', async () => {
@@ -149,6 +155,7 @@ describe('Ballots routes:', () => {
       const res = await requester.get('/ballots/khsfkhhkhsf/proceed');
 
       expect(res).to.have.status(404);
+      expect(res.body).to.deep.equal({ errors: [{ status: 404, detail: 'Ballot not found' }] });
     });
   });
 });

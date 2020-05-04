@@ -7,6 +7,7 @@ import Mention from 'models/mention';
 import database from 'db/database';
 import uuid from 'uuid';
 import User from 'models/user';
+import { Error as JSONApiError } from 'jsonapi-serializer';
 
 export default class BallotController {
   // Returns all created ballots from user
@@ -14,7 +15,8 @@ export default class BallotController {
     let creatorUuid = request.body.user.uuid;
 
     if (isUndefined(creatorUuid)) {
-      response.status(401).json({ ok: false, error: { message: 'Requête refusée pour cette ressource.' } });
+      const err = new JSONApiError({ status: 401, detail: 'Access denied' });
+      response.status(401).json(err);
     }
 
     let ballots = [];
@@ -22,7 +24,8 @@ export default class BallotController {
     try {
       ballots = await Ballot.findAll({ creatorUuid });
     } catch ({ code, message }) {
-      response.status(code).json({ ok: false, error: { message } });
+      const err = new JSONApiError({ status: code, detail: message });
+      response.status(code).json(err);
       return;
     }
 
@@ -34,14 +37,16 @@ export default class BallotController {
     let creatorUuid = request.body.user.uuid;
 
     if (isUndefined(payload) || isUndefined(payload.name) || payload.candidates.length < 2) {
-      response.status(422).json({ ok: false, error: { message: 'Il manque des informations pour la création de votre vote.' } });
+      const err = new JSONApiError({ status: 422, detail: 'Missing parameters for creating the ballot' });
+      response.status(422).json(err);
       return;
     }
 
     try {
       await database.open();
     } catch (error) {
-      response.status(500).json({ error: { message: 'An error occuried, please retry later' } });
+      const err = new JSONApiError({ status: 500, detail: 'An error occuried, please retry later' });
+      response.status(500).json(err);
       return;
     }
 
@@ -55,7 +60,8 @@ export default class BallotController {
     } catch (e) {
       console.error('Ballot error insertion: ', e);
       await database.close();
-      response.status(500).json({ error: { message: 'An error occuried' } });
+      const err = new JSONApiError({ status: 500, detail: 'An error occuried' });
+      response.status(500).json(err);
       return;
     }
 
@@ -70,7 +76,8 @@ export default class BallotController {
       await database.run(query);
     } catch (e) {
       await database.close();
-      response.status(500).json(e);
+      const err = new JSONApiError({ status: 500, detail: e });
+      response.status(500).json(err);
       return;
     }
 
@@ -82,7 +89,8 @@ export default class BallotController {
   static async getBallot(request, response) {
     let { ballotUrl } = request.params;
     if (isUndefined(ballotUrl)) {
-      response.status(422).json({ ok: false, error: { message: 'No Ballot url provided' } });
+      const err = new JSONApiError({ status: 422, detail: 'No ballot url provided' });
+      response.status(422).json(err);
       return;
     }
 
@@ -90,7 +98,8 @@ export default class BallotController {
     try {
       ballot = await Ballot.findByUrl(ballotUrl);
     } catch ({ code, message }) {
-      response.status(code).json({ ok: false, error: { message } });
+      const err = new JSONApiError({ status: code, detail: message });
+      response.status(code).json(err);
       return;
     }
 
@@ -103,12 +112,14 @@ export default class BallotController {
     let votesToAdd = [];
 
     if (isUndefined(vote)) {
-      response.status(422).json({ ok: false, error: { message: 'Aucun vote fourni.' } });
+      const err = new JSONApiError({ status: 422, detail: 'No vote given' });
+      response.status(422).json(err);
       return;
     }
 
     if (isEmpty(vote.candidates)) {
-      response.status(422).json({ ok: false, error: { message: 'Auncun candidates fourni pour le vote' } });
+      const err = new JSONApiError({ status: 422, detail: 'No candidates provided for the vote' });
+      response.status(422).json(err);
       return;
     }
 
@@ -119,7 +130,8 @@ export default class BallotController {
       await database.open();
     } catch (error) {
       console.error(error);
-      response.status(500).json({ ok: false, error: { message: 'An error occuried' } });
+      const err = new JSONApiError({ status: 500, detail: 'An error occuried' });
+      response.status(500).json(err);
       return;
     }
 
@@ -129,14 +141,16 @@ export default class BallotController {
       capsule = await database.get(query);
     } catch (error) {
       await database.close();
-      response.status(500).json(error);
+      const err = new JSONApiError({ status: 500, detail: error });
+      response.status(500).json(err);
       return;
     }
 
     let ballotCapsule = capsule.data;
 
     if (isUndefined(ballotCapsule)) {
-      response.status(404).json({ ok: false, error: { message: 'Aucune élection trouvée.' } });
+      const err = new JSONApiError({ status: 404, detail: 'No election found' });
+      response.status(404).json(err);
       return;
     }
 
@@ -166,7 +180,8 @@ export default class BallotController {
         return new Vote(candidate, mentionToAdd);
       });
     } catch (error) {
-      response.status(422).json({ ok: false, error: { message: 'Parametres manquants pour voter', body: error } });
+      const err = new JSONApiError({ status: 422, detail: { message: 'Missing parameters to vote', body: error } });
+      response.status(422).json(err);
       return;
     }
 
@@ -183,7 +198,8 @@ export default class BallotController {
       await database.run(finalInsertQuery);
     } catch (error) {
       await database.close();
-      response.status(500).json({ ok: false, error: { message: 'Insert votes in database failed', body: error } });
+      const err = new JSONApiError({ status: 500, detail: { message: 'Votes database insert failed', body: error } });
+      response.status(500).json(err);
       return;
     }
 
@@ -204,7 +220,8 @@ export default class BallotController {
       await database.open();
     } catch (e) {
       console.error('Database connection failed');
-      response.status(500).json({ error: { message: 'An error has occuried' } });
+      const err = new JSONApiError({ status: 500, detail: 'An error has occuried' });
+      response.status(500).json(err);
     }
 
     let query = `SELECT * FROM ballots INNER JOIN votes ON votes.ballot_uuid = ballots.ballot_uuid INNER JOIN candidates ON candidates.candidate_uuid = votes.candidate_uuid WHERE votes.ballot_uuid="${uuid}"`;
@@ -215,14 +232,16 @@ export default class BallotController {
     } catch (error) {
       console.log(error);
       await database.close();
-      response.status(500).json(error);
+      const err = new JSONApiError({ status: 500, detail: error });
+      response.status(500).json(err);
       return;
     }
 
     let tmp = capsule.data[0];
 
     if (isUndefined(tmp)) {
-      response.status(404).json({ error: { message: 'Ballot not found' } });
+      const err = new JSONApiError({ status: 404, detail: 'Ballot not found' });
+      response.status(404).json(err);
       return;
     }
 
@@ -256,7 +275,8 @@ export default class BallotController {
       try {
         userCapsule = await database.get(`SELECT * FROM users where users.uuid ="${creatorUuid}"`);
       } catch (error) {
-        response.status(500).json({ error: { message: 'Error user GET database', body: error } });
+        const err = new JSONApiError({ status: 500, detail: { message: 'Error user GET database', body: error } });
+        response.status(500).json(err);
         return;
       }
 
@@ -267,7 +287,8 @@ export default class BallotController {
         try {
           await ballot.setFinished(true);
         } catch ({ code, message }) {
-          response.status(code).json({ ok: false, error: { message } });
+          const err = new JSONApiError({ status: code, detail: message });
+          response.status(code).json(err);
         }
       }
     }
