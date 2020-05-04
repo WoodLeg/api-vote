@@ -48,7 +48,8 @@ export default class UserController {
     let { username, password } = request.body;
 
     if (isNull(username) || isNull(password) || isUndefined(username) || isUndefined(username)) {
-      response.status(422).json({ error: { message: 'Aucune information fournie' } });
+      let err = new JSONApiError({ status: 422, detail: 'Missing parameters' });
+      response.status(422).json(err);
       return;
     }
     let user = new User(username);
