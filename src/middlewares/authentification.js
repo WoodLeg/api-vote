@@ -1,10 +1,12 @@
 import { isUndefined } from 'lodash';
 import jwt from 'jsonwebtoken';
+import { Error as JSONApiError } from 'jsonapi-serializer';
 
 export const isAuthenticated = (request, response, next) => {
   let authorization = request.headers.authorization;
   if (isUndefined(authorization)) {
-    response.status(401).json({ error: 'Missing jwt' });
+    const error = new JSONApiError({ status: 401, detail: 'Missing jwt header' });
+    response.status(401).json(error);
     return;
   }
 
