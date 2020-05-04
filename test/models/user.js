@@ -14,21 +14,6 @@ describe('User model', () => {
     expect(user.password).to.be.ok;
     expect(user.id).to.be.ok;
     expect(user.uuid).to.be.ok;
-    expect(user.getId).to.not.be.undefined;
-    expect(user.getUuid).to.not.be.undefined;
-    expect(user.getUsername).to.not.be.undefined;
-  });
-
-  it('getUsername() should return the username', () => {
-    expect(user.getUsername()).to.be.equal(username);
-  });
-
-  it('getUuid() should return the uuid', () => {
-    expect(user.getUuid()).to.be.equal(uuid);
-  });
-
-  it('getId() should return the id', () => {
-    expect(user.getId()).to.be.equal(id);
   });
 
   it('testPassword() should test the given password with the hash one', () => {
