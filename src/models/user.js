@@ -4,13 +4,13 @@ import { isNull, isUndefined } from 'lodash';
 import uuid from 'uuid';
 
 export default class User {
-  username = null;
+  email = null;
   password = null;
   uuid = null;
   id = null;
 
-  constructor(username, password, options = {}) {
-    this.username = username;
+  constructor(email, password, options = {}) {
+    this.email = email;
     this.password = password || null;
     this.uuid = options.uuid || uuid.v4();
     this.id = options.id || null;
@@ -29,7 +29,7 @@ export default class User {
     return bcrypt.compareSync(password, this.password);
   }
 
-  static async findByUsername(username) {
+  static async findByEmail(email) {
     return new Promise(async (resolve, reject) => {
       try {
         await database.open();
@@ -38,25 +38,25 @@ export default class User {
         reject({ code: 500, message: 'Une erreur est survenue' });
         return;
       }
-
-      let query = `SELECT * from users WHERE username='${username}'`;
+      console.log(email);
+      let query = `SELECT * from users WHERE email='${email}'`;
       let capsule = {};
       try {
         capsule = await database.get(query);
       } catch (error) {
         await database.close();
         console.error('Database query failed: ', error);
-        reject({ code: 500, message: 'Une erreur est survenue.' });
+        reject({ code: 500, message: 'A database error occuried.' });
       }
       await database.close();
 
       if (isUndefined(capsule.data)) {
-        reject({ code: 404, message: 'Pseudo non trouvé.' });
+        reject({ code: 404, message: 'Email not found' });
         return;
       }
 
       let rawUser = capsule.data;
-      let user = new User(rawUser.username, rawUser.password, { id: rawUser.id, uuid: rawUser.uuid });
+      let user = new User(rawUser.email, rawUser.password, { id: rawUser.id, uuid: rawUser.uuid });
       resolve(user);
     });
   }
@@ -69,7 +69,7 @@ export default class User {
         reject(error);
       }
 
-      let query = `SELECT * from users WHERE username='${this.username}'`;
+      let query = `SELECT * from users WHERE email='${this.email}'`;
 
       let found;
       try {
@@ -79,10 +79,10 @@ export default class User {
       }
 
       if (found.data) {
-        reject({ code: 401, message: 'Username already taken' });
+        reject({ code: 401, message: 'Email already taken' });
       }
 
-      let insertQuery = `INSERT INTO users (username, password, uuid) VALUES ('${this.username}', '${this.password}', '${this.uuid}');`;
+      let insertQuery = `INSERT INTO users (email, password, uuid) VALUES ('${this.email}', '${this.password}', '${this.uuid}');`;
       try {
         await database.run(insertQuery);
       } catch (error) {

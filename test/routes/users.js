@@ -16,7 +16,7 @@ describe('User routes:', () => {
     });
 
     it('should return 200 with user payload', async () => {
-      const res = await requester.post('/users/signin').send({ username: 'Jim', password: 'qwerty' });
+      const res = await requester.post('/users/signin').send({ email: 'michael.scott@dm.com', password: 'qwerty' });
 
       expect(res).to.have.status(200);
       let payload = res.body;
@@ -24,7 +24,7 @@ describe('User routes:', () => {
         type: 'users',
         id: '1',
         attributes: {
-          username: 'Jim',
+          email: 'michael.scott@dm.com',
           uuid: '1111-1111111-1111-11111'
         }
       });
@@ -46,26 +46,26 @@ describe('User routes:', () => {
     });
 
     it('should returns 401 if username invalid', async () => {
-      const res = await requester.post('/users/signin').send({ username: 'Peter', password: 'qwerty' });
+      const res = await requester.post('/users/signin').send({ email: 'dwight.shrutt@dm.com', password: 'qwerty' });
 
       expect(res).to.have.status(401);
-      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Username or password invalid' }] });
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Email or password invalid' }] });
     });
 
     it('should returns 401 if password invalid', async () => {
-      const res = await requester.post('/users/signin').send({ username: 'Jim', password: 'hendrix' });
+      const res = await requester.post('/users/signin').send({ email: 'michael.scott@dm.com', password: 'hendrix' });
 
       expect(res).to.have.status(401);
-      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Wrong username or password' }] });
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Wrong email or password' }] });
     });
   });
 
   describe('POST /users/signup', () => {
     it('should return 201', async () => {
-      const res = await requester.post('/users/signup').send({ username: 'Janis', password: 'joplin' });
+      const res = await requester.post('/users/signup').send({ email: 'andy.bernard@dm.com', password: 'dunder' });
       expect(res).to.have.status(201);
       let payload = res.body;
-      expect(payload.data.attributes.username).to.be.equal('Janis');
+      expect(payload.data.attributes.email).to.be.equal('andy.bernard@dm.com');
       expect(payload.data.attributes.uuid).to.match(/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/);
       let bearer = payload.meta.bearer.split(' ');
       expect(bearer[0]).to.equal('Bearer');
@@ -73,9 +73,9 @@ describe('User routes:', () => {
     });
 
     it('should return 422 when trying to signup already', async () => {
-      const res = await requester.post('/users/signup').send({ username: 'Jim', password: 'qwerty' });
+      const res = await requester.post('/users/signup').send({ email: 'michael.scott@dm.com', password: 'qwerty' });
       expect(res).to.have.status(401);
-      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Username already taken' }] });
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Email already taken' }] });
     });
 
     it('should return 422 if no data is provided', async () => {

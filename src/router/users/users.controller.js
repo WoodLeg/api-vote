@@ -5,9 +5,9 @@ import { Serializer, Error as JSONApiError } from 'jsonapi-serializer';
 
 export default class UserController {
   static async signin(request, response) {
-    let { username, password } = request.body;
+    let { email, password } = request.body;
 
-    if (isNull(username) || isNull(password) || isUndefined(username) || isUndefined(password)) {
+    if (isNull(email) || isNull(password) || isUndefined(email) || isUndefined(password)) {
       let err = new JSONApiError({ status: 422, detail: 'Missing parameters' });
       response.status(422).json(err);
       return;
@@ -15,11 +15,11 @@ export default class UserController {
 
     let user;
     try {
-      user = await User.findByUsername(username);
+      user = await User.findByEmail(email);
     } catch ({ code, message }) {
       let err;
       if (code === 404) {
-        err = new JSONApiError({ status: 401, detail: 'Username or password invalid' });
+        err = new JSONApiError({ status: 401, detail: 'Email or password invalid' });
         response.status(401).json(err);
         return;
       }
@@ -31,28 +31,28 @@ export default class UserController {
     let userAuthenticated = user.testPassword(password);
 
     let bearer = 'Bearer ';
-    bearer += jwt.sign({ username: user.username, uuid: user.uuid }, 'dredd');
+    bearer += jwt.sign({ email: user.email, uuid: user.uuid }, 'dredd');
 
-    const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'], meta: { bearer } });
+    const UserSerializer = new Serializer('users', { attributes: ['email', 'uuid'], meta: { bearer } });
 
     if (userAuthenticated) {
       let payload = UserSerializer.serialize(user);
       response.json(payload);
     } else {
-      const err = new JSONApiError({ status: 401, detail: 'Wrong username or password' });
+      const err = new JSONApiError({ status: 401, detail: 'Wrong email or password' });
       response.status(401).json(err);
     }
   }
 
   static async signup(request, response) {
-    let { username, password } = request.body;
+    let { email, password } = request.body;
 
-    if (isNull(username) || isNull(password) || isUndefined(username) || isUndefined(username)) {
+    if (isNull(email) || isNull(password) || isUndefined(email) || isUndefined(password)) {
       let err = new JSONApiError({ status: 422, detail: 'Missing parameters' });
       response.status(422).json(err);
       return;
     }
-    let user = new User(username);
+    let user = new User(email);
     user.addPassword(password);
 
     try {
@@ -64,9 +64,9 @@ export default class UserController {
     }
 
     let bearer = 'Bearer ';
-    bearer += jwt.sign({ username: user.username, uuid: user.uuid }, 'dredd');
+    bearer += jwt.sign({ email: user.email, uuid: user.uuid }, 'dredd');
 
-    const UserSerializer = new Serializer('users', { attributes: ['username', 'uuid'], meta: { bearer } });
+    const UserSerializer = new Serializer('users', { attributes: ['email', 'uuid'], meta: { bearer } });
     let payload = UserSerializer.serialize(user);
 
     response.status(201).json(payload);

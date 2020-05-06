@@ -2,15 +2,15 @@ import { expect } from 'chai';
 import User from '../../src/models/user';
 
 describe('User model', () => {
-  let username = 'Dredd';
+  let email = 'michael.scott@dm.com';
   let password = 'judge';
   let hashPassword = '$2b$10$BSm./4F3IoiCWBFpLp0JL.cmsTO9XzF7XKZfDyIEZvIT.tJDchN/i';
   let uuid = '1111-11111-1111-11111';
   let id = 1;
-  let user = new User(username, password, { uuid, id });
+  let user = new User(email, password, { uuid, id });
 
   it('everything is defined properly', () => {
-    expect(user.username).to.be.ok;
+    expect(user.email).to.be.ok;
     expect(user.password).to.be.ok;
     expect(user.id).to.be.ok;
     expect(user.uuid).to.be.ok;
@@ -21,10 +21,10 @@ describe('User model', () => {
     expect(user.testPassword(password)).to.be.true;
   });
 
-  describe('findByUsername()', () => {
+  describe('findByEmail()', () => {
     it('should return the user', async () => {
-      const found = await User.findByUsername('Jim');
-      expect(found).to.have.ownProperty('username');
+      const found = await User.findByEmail('michael.scott@dm.com');
+      expect(found).to.have.ownProperty('email');
       expect(found).to.have.ownProperty('password');
       expect(found).to.have.ownProperty('uuid');
       expect(found).to.have.ownProperty('id');
@@ -32,7 +32,7 @@ describe('User model', () => {
 
     it('should return a 404 with error payload', async () => {
       try {
-        await User.findByUsername('Jac');
+        await User.findByEmail('jim.halpert@dm.com');
       } catch (error) {
         expect(error).to.have.ownProperty('code');
         expect(error.code).to.be.equal(404);

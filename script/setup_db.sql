@@ -11,7 +11,7 @@ CREATE TABLE ballots
 CREATE TABLE users
 (
   id INTEGER PRIMARY KEY NOT NULL,
-  username TEXT NOT NULL,
+  email TEXT NOT NULL,
   password TEXT,
   uuid TEXT NOT NULL UNIQUE
 );
@@ -33,6 +33,6 @@ CREATE TABLE votes
 );
 
 INSERT INTO users
-  (username, password, uuid)
+  (email, password, uuid)
 VALUES
-  ('Paul', "$2b$10$t5hdPcGMhgiFs0WBJxU/i.jbtPP9mHiIOUZ4hvK0n44UAwzleVFKu", "1111-1111111-1111-11111");
+  ('paul@qonto.eu', "$2b$10$t5hdPcGMhgiFs0WBJxU/i.jbtPP9mHiIOUZ4hvK0n44UAwzleVFKu", "1111-1111111-1111-11111");
