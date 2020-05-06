@@ -33,7 +33,7 @@ export default class UserController {
     let bearer = 'Bearer ';
     bearer += jwt.sign({ email: user.email, uuid: user.uuid }, 'dredd');
 
-    const UserSerializer = new Serializer('users', { attributes: ['email', 'uuid'], meta: { bearer } });
+    const UserSerializer = new Serializer('user', { id: 'uuid', attributes: ['email', 'uuid'], meta: { bearer }, pluralizeType: false });
 
     if (userAuthenticated) {
       let payload = UserSerializer.serialize(user);
@@ -66,7 +66,7 @@ export default class UserController {
     let bearer = 'Bearer ';
     bearer += jwt.sign({ email: user.email, uuid: user.uuid }, 'dredd');
 
-    const UserSerializer = new Serializer('users', { attributes: ['email', 'uuid'], meta: { bearer } });
+    const UserSerializer = new Serializer('user', { id: 'uuid', attributes: ['email', 'uuid'], meta: { bearer }, pluralizeType: false });
     let payload = UserSerializer.serialize(user);
 
     response.status(201).json(payload);
