@@ -38,7 +38,6 @@ export default class User {
         reject({ code: 500, message: 'Une erreur est survenue' });
         return;
       }
-      console.log(email);
       let query = `SELECT * from users WHERE email='${email}'`;
       let capsule = {};
       try {

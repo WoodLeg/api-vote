@@ -45,13 +45,20 @@ export default class UserController {
   }
 
   static async signup(request, response) {
-    let { email, password } = request.body;
+    let { email, password, confirmPassword } = request.body;
 
-    if (isNull(email) || isNull(password) || isUndefined(email) || isUndefined(password)) {
+    if (isNull(email) || isNull(password) || isNull(confirmPassword) || isUndefined(email) || isUndefined(password) || isUndefined(confirmPassword)) {
       let err = new JSONApiError({ status: 422, detail: 'Missing parameters' });
       response.status(422).json(err);
       return;
     }
+
+    if (password !== confirmPassword) {
+      let err = new JSONApiError({ status: 422, detail: 'Password and ConfirmPassword are differents' });
+      response.status(422).json(err);
+      return;
+    }
+
     let user = new User(email);
     user.addPassword(password);
 

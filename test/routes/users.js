@@ -21,8 +21,8 @@ describe('User routes:', () => {
       expect(res).to.have.status(200);
       let payload = res.body;
       expect(payload.data).to.deep.equal({
-        type: 'users',
-        id: '1',
+        type: 'user',
+        id: '1111-1111111-1111-11111',
         attributes: {
           email: 'michael.scott@dm.com',
           uuid: '1111-1111111-1111-11111'
@@ -62,7 +62,7 @@ describe('User routes:', () => {
 
   describe('POST /users/signup', () => {
     it('should return 201', async () => {
-      const res = await requester.post('/users/signup').send({ email: 'andy.bernard@dm.com', password: 'dunder' });
+      const res = await requester.post('/users/signup').send({ email: 'andy.bernard@dm.com', password: 'dunder', confirmPassword: 'dunder' });
       expect(res).to.have.status(201);
       let payload = res.body;
       expect(payload.data.attributes.email).to.be.equal('andy.bernard@dm.com');
@@ -73,7 +73,7 @@ describe('User routes:', () => {
     });
 
     it('should return 422 when trying to signup already', async () => {
-      const res = await requester.post('/users/signup').send({ email: 'michael.scott@dm.com', password: 'qwerty' });
+      const res = await requester.post('/users/signup').send({ email: 'michael.scott@dm.com', password: 'qwerty', confirmPassword: 'qwerty' });
       expect(res).to.have.status(401);
       expect(res.body).to.be.deep.equal({ errors: [{ status: 401, detail: 'Email already taken' }] });
     });
@@ -82,6 +82,12 @@ describe('User routes:', () => {
       const res = await requester.post('/users/signup');
       expect(res).to.have.status(422);
       expect(res.body).to.be.deep.equal({ errors: [{ status: 422, detail: 'Missing parameters' }] });
+    });
+
+    it('should return 422 if password and confirmPassword are different', async () => {
+      const res = await requester.post('/users/signup').send({ email: 'michael.scott@dm.com', password: 'qwerty', confirmPassword: 'azerty' });
+      expect(res).to.have.status(422);
+      expect(res.body).to.be.deep.equal({ errors: [{ status: 422, detail: 'Password and ConfirmPassword are differents' }] });
     });
   });
 });
