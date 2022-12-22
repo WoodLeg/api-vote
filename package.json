@@ -44,7 +44,7 @@
     "dotenv": "^7.0.0",
     "express": "^4.17.1",
     "jsonapi-serializer": "^3.6.6",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.11",
     "morgan": "^1.9.1",
     "prettier": "^1.16.4",
